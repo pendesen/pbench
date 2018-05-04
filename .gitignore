@@ -1,0 +1,10 @@
+out
+*.sw?
+.#*
+*#
+*~
+.classpath
+.project
+.settings
+.idea
+

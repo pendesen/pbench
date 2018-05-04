@@ -1,0 +1,3 @@
+user_id     search
+123         search_str
+124         str
