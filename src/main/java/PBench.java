@@ -1,5 +1,3 @@
-
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -55,7 +53,7 @@ public class PBench {
 
   private AtomicLong receive_bytes = new AtomicLong();
 
-  private final long testStartTime = System.currentTimeMillis();
+  private long testStartTime;
 
   private final Map<String, List<String>> paramMap = new HashMap<String, List<String>>();
 
@@ -125,6 +123,7 @@ public class PBench {
 
       parseParamFile(paramReplaceName.keySet());
     }
+    paramConstantName.put("chaos_monkey", "true");
 
   }
 
@@ -182,6 +181,11 @@ public class PBench {
     long loop_start = System.currentTimeMillis();
     long receive_bytes_0 = receive_bytes.get();
     int send_requests_0 = responseTimeMap.size();
+    testStartTime = System.currentTimeMillis();
+    int completed_ok_0 = completed_ok.get();
+    int completed_fail_0 = completed_fail.get();
+    int future_fail_0 = future_failed.get();
+    int future_cancel_0 = future_cancelled.get();
     for (int i = 0; i < loops ; i++) { // one loop one second
       for (int j = 0; j < qps_times; j++) {
         final long start = System.currentTimeMillis();
@@ -199,11 +203,22 @@ public class PBench {
       }
       if (i % print_loops == (print_loops - 1)) {
         double time = (System.currentTimeMillis() - loop_start) / 1000.0;
-        println(String.format("TPS: %d, Delay: %dms, Rate: %.3f MB/s", (int)((responseTimeMap.size() - send_requests_0) / time), responseDelayTime.get() / responseTimeMap.size(),
-            (receive_bytes.get() - receive_bytes_0) / 1024.0 / 1024.0 / time));
+        if (time == 0.0) {
+          time = 1.0;
+        }
+        println(String.format("Time: %s TPS: %d, Delay: %dms, Rate: %.3f MB/s,  OK: %d, Fail: %d, Exception: %d, Cancel: %d ", getTime(),
+            (int)((responseTimeMap.size() - send_requests_0) / time), responseDelayTime.get() / (responseTimeMap.size() == 0 ? 1 : responseTimeMap.size()),
+            (receive_bytes.get() - receive_bytes_0) / 1024.0 / 1024.0 / time,
+            completed_ok.get() - completed_ok_0, completed_fail.get() - completed_fail_0,
+            future_failed.get() - future_fail_0, future_cancelled.get() - future_cancel_0
+        ));
         loop_start = System.currentTimeMillis();
         receive_bytes_0 = receive_bytes.get();
         send_requests_0 = responseTimeMap.size();
+        completed_ok_0 = completed_ok.get();
+        completed_fail_0 = completed_fail.get();
+        future_fail_0 = future_failed.get();
+        future_cancel_0 = future_cancelled.get();
       }
     }
 
@@ -275,9 +290,9 @@ public class PBench {
 
   private static CloseableHttpAsyncClient getClient() {
     RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectTimeout(30000)
-        .setSocketTimeout(30000)
-        .setConnectionRequestTimeout(10000)
+        .setConnectTimeout(3000)
+        .setSocketTimeout(3000)
+        .setConnectionRequestTimeout(1000)
         .build();
 
     //配置io线程
@@ -335,7 +350,6 @@ public class PBench {
     public void failed(final Exception e) {
       recordTime();
       future_failed.incrementAndGet();
-      e.printStackTrace();
     }
 
     public void cancelled() {
@@ -352,3 +366,4 @@ public class PBench {
 
 
 }
+

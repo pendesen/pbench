@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="PBench" default="start" basedir=".">
+    <target name="start">
+        <echo>Starting PBench</echo>
+        <java fork="true" jar="target/PBench-1.0-SNAPSHOT.jar" spawn="truea">
+            <classpath>
+                <pathelement location ="target/lib"/>
+                <fileset dir="target/lib">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="stop">
+        <echo>Stop PBench></echo>
+        <exec executable="bash">
+            <arg value="-c"/>
+            <arg value="jps -l | grep PBench | awk -F' ' '{print $1}'| xargs -t kill -9"/>
+        </exec>
+    </target>
+</project>
