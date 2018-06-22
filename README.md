@@ -1,9 +1,13 @@
 # pbench
 This is a Maven Java Project.
 
+Build: mvn package
+
 Run:
-pass in the program argument like:
--t 10 -l 3 -q 300 "http://10.189.100.42:8004/users?search=n&with=ns&byPassThroughMode=false&@{user_id}=1&limit=2000" 
+Go to pbench directory and execute:
+java -Djava.ext.dirs=target/lib -jar target/PBench-1.0-SNAPSHOT.jar -t 1000000 -l 2 -v 3 -q 20 "http://localhost:8005/users?search=suggested&filter=no&with=contacts&@{user_id}=100&limit=2000"
+
+Parameter read from 'param.txt' file.
 
 Arguments Specification:
 -t: test time in seconds

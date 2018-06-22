@@ -268,7 +268,7 @@ public class PBench {
     }
     println(String.format("Average Delay: %dms", (total / responseTimeMap.size())));
     TreeSet<Long> sortSet = new TreeSet<Long>(responseTimeMap.values());
-    long[] percentiles = new long[5];
+    long[] percentiles = new long[6];
     final int size = sortSet.size();
     Long[] sorted = sortSet.toArray(new Long[size]);
     percentiles[0] = sorted[(int)(size * 0.50)];
@@ -276,8 +276,9 @@ public class PBench {
     percentiles[2] = sorted[(int)(size * 0.90)];
     percentiles[3] = sorted[(int)(size * 0.95)];
     percentiles[4] = sorted[(int)(size * 0.99)];
-    println(String.format("Response Percentiles(0.50,0.75,0.90,0.95,0.99): %d %d %d %d %d", percentiles[0],
-        percentiles[1],percentiles[2],percentiles[3],percentiles[4]));
+    percentiles[5] = sorted[(int)(size * 0.999)];
+    println(String.format("Response Percentiles(0.50,0.75,0.90,0.95,0.99,0.999): %d %d %d %d %d %d", percentiles[0],
+        percentiles[1],percentiles[2],percentiles[3],percentiles[4],percentiles[5]));
 
   }
 
